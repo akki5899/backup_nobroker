@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python run.py)",
+      "Bash(curl -s http://localhost:8000/docs)",
+      "Bash(python -m venv venv)"
+    ]
+  }
+}

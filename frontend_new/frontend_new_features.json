@@ -1,0 +1,295 @@
+{
+  "project": "PropDirect Frontend New (Next.js)",
+  "description": "Comprehensive inventory of frontend_new features, pages, components, API integration, services, models and utilities. Fully integrated with PropDirect Backend API.",
+  "generated_at": "2026-02-15T00:00:00Z",
+  "framework": {
+    "platform": "Next.js (app router)",
+    "language": "TypeScript + React",
+    "styling": "Tailwind CSS",
+    "bundler_and_tools": ["Vercel/Next.js", "ESLint", "PostCSS"],
+    "http_client": "axios with interceptors for auth and error handling"
+  },
+  "pages_and_routes": {
+    "authentication": ["/login", "/signup"],
+    "browsing": ["/", "/buy", "/rent", "/sell", "/properties", "/properties/[id]"],
+    "map_and_search": ["/map-view", "/geofence-search"],
+    "user_features": ["/profile", "/favorites", "/notifications", "/chats"],
+    "owner_features": ["/owner", "/owner/dashboard", "/owner/listings", "/my-listings", "/post-property"],
+    "monetization": ["/refer", "/rewards", "/plans"],
+    "other": ["/dashboard", "/services", "/help", "/commercial", "/plots"]
+  },
+  "major_components": {
+    "layout": ["Header.tsx", "Footer.tsx"],
+    "property_display": ["PropertyCard.tsx", "PropertyDetailPanel.tsx", "PropertyListingPage.tsx"],
+    "map": ["Map.tsx", "MapModal.tsx", "MapWrapper.tsx", "MapFilters.tsx", "MapLegend.tsx"],
+    "auth": ["OTPVerification.tsx", "LoginForm.tsx", "SignupForm.tsx"],
+    "interaction": ["ChatBot.tsx", "SearchBar.tsx", "ConnectivityFilters.tsx"],
+    "ui_utilities": ["Toast.tsx", "ErrorBoundary.tsx", "LoadingSpinner.tsx"]
+  },
+  "api_integration": {
+    "file": "src/utils/api_client.ts",
+    "base_url": "NEXT_PUBLIC_API_URL or default http://localhost:8000/api/v1",
+    "http_client": "axios",
+    "auth_storage": "localStorage (token & user object)",
+    "request_interceptor": "Automatically adds Authorization: Bearer <token> header",
+    "response_interceptor": "Handles 401 errors by clearing auth and redirecting to /login",
+    "endpoints_by_service": {
+      "auth": {
+        "login": "POST /auth/login - OAuth2 form-encoded credentials",
+        "register": "POST /auth/register - Create new user with validation",
+        "check_user": "GET /auth/check-user - Check if email exists",
+        "send_otp": "POST /auth/send-otp - Send OTP to email or phone",
+        "verify_otp": "POST /auth/verify-otp - Verify OTP and mark user verified",
+        "logout": "POST /auth/logout - Server-side logout (best-effort)"
+      },
+      "properties": {
+        "list_search": "GET /properties - Search with filters (city, type, price, bedrooms, etc)",
+        "get_by_id": "GET /properties/{id} - Get property details and increment views",
+        "create": "POST /properties - Create new property (owner only, auto-generates title)",
+        "update": "PUT /properties/{id} - Update property (owner only)",
+        "delete": "DELETE /properties/{id} - Delete property and remove images (owner only)",
+        "bulk_delete": "DELETE /properties/bulk - Bulk delete multiple properties (owner only)",
+        "upload_images": "POST /properties/{id}/images - Upload property images (multipart/form-data)",
+        "delete_image": "DELETE /properties/{id}/images/{imageId} - Delete specific image (owner only)",
+        "radius_search": "POST /properties/radius-search - Search via Haversine formula with lat/lng/radius",
+        "geofence_search": "POST /properties/geofence-search - Search within polygon coordinates",
+        "debug_sample": "GET /properties/debug/sample - Get sample 5 properties (debug only)",
+        "debug_count": "GET /properties/debug/count - Get stats and sample cities (debug only)"
+      },
+      "users": {
+        "get_profile": "GET /users/me - Get current authenticated user profile",
+        "update_profile": "PUT /users/me - Update user profile fields",
+        "delete_account": "DELETE /users/me - Delete user and associated images",
+        "get_my_properties": "GET /users/my-properties - List properties owned by current user"
+      },
+      "inquiries": {
+        "create": "POST /inquiries - Create inquiry for property (prevents owner and duplicates)",
+        "get_my_inquiries": "GET /inquiries/my-inquiries - List inquiries made by user",
+        "get_property_inquiries": "GET /inquiries/property-inquiries - List inquiries on user's properties",
+        "get_by_id": "GET /inquiries/{id} - Get specific inquiry",
+        "update": "PUT /inquiries/{id} - Update inquiry (property owner can update inquiries on their properties)",
+        "delete": "DELETE /inquiries/{id} - Delete specific inquiry",
+        "bulk_delete": "DELETE /inquiries/bulk - Bulk delete user's inquiries"
+      },
+      "wishlist": {
+        "get_wishlist": "GET /wishlist - Get wishlist items with property details",
+        "add": "POST /wishlist/{propertyId} - Add property to wishlist",
+        "remove": "DELETE /wishlist/{propertyId} - Remove property from wishlist",
+        "check_status": "GET /wishlist/check/{propertyId} - Check if property is favorited"
+      },
+      "notifications": {
+        "list": "GET /notifications - Get latest 20 notifications with unread count",
+        "mark_read": "PUT /notifications/{id}/read - Mark single notification as read",
+        "mark_all_read": "PUT /notifications/mark-all-read - Mark all notifications as read"
+      },
+      "contacts": {
+        "get_my_contacts": "GET /contacts/my-contacts - Get unique owners from user's inquiries"
+      },
+      "timeline": {
+        "get_activities": "GET /timeline/activities - Build user activity timeline from inquiries and listings"
+      },
+      "visits": {
+        "get_my_visits": "GET /visits/my-visits - Fetch property visits (PropertyVisit model)"
+      },
+      "agreements": {
+        "get_my_agreements": "GET /agreements/my-agreements - Fetch rental agreements for tenant"
+      },
+      "rewards": {
+        "get_points": "GET /rewards/points - Compute user points from activities (properties, inquiries)",
+        "get_available": "GET /rewards/available - List available rewards (static)"
+      },
+      "referrals": {
+        "get_code": "GET /referrals/code - Generate referral code (PROP{user_id:06d})",
+        "get_stats": "GET /referrals/stats - Get referral stats (mock/stubbed)"
+      },
+      "chatbot": {
+        "send_message": "POST /chatbot/chat - Rule-based chatbot for common queries"
+      }
+    }
+  },
+  "service_api_modules": {
+    "propertyAPI": ["search", "getById", "create", "update", "delete", "bulkDelete", "uploadImages", "deleteImage", "radiusSearch", "geofenceSearch", "getDebugSample", "getDebugCount"],
+    "authAPI": ["login", "register", "checkUser", "sendOTP", "verifyOTP", "logout", "getCurrentUser"],
+    "userAPI": ["getProfile", "updateProfile", "deleteAccount", "getMyProperties"],
+    "inquiryAPI": ["create", "getMyInquiries", "getPropertyInquiries", "getById", "update", "delete", "bulkDelete"],
+    "wishlistAPI": ["getWishlist", "addToWishlist", "removeFromWishlist", "checkWishlistStatus"],
+    "notificationAPI": ["getNotifications", "markAsRead", "markAllAsRead"],
+    "contactsAPI": ["getMyContacts"],
+    "timelineAPI": ["getActivities"],
+    "visitsAPI": ["getMyVisits"],
+    "agreementsAPI": ["getMyAgreements"],
+    "rewardsAPI": ["getUserPoints", "getAvailableRewards"],
+    "referralsAPI": ["getReferralCode", "getReferralStats"],
+    "chatbotAPI": ["sendMessage"]
+  },
+  "geospatial_features": {
+    "components": ["Map.tsx", "MapWrapper.tsx", "MapModal.tsx", "MapFilters.tsx", "MapLegend.tsx"],
+    "capabilities": [
+      "Interactive map with property pins",
+      "Geofence polygon drawing and search",
+      "Radius search (Haversine formula)",
+      "Map filters and dynamic legends",
+      "Heatmap visualization (PriceHeatmap component)",
+      "Market analytics (MarketAnalytics component)",
+      "Property clustering and zoom handlers",
+      "Real-time property marker updates"
+    ]
+  },
+  "authentication_and_security": {
+    "token_storage": "localStorage with key 'token'",
+    "user_storage": "localStorage with key 'user' (JSON serialized)",
+    "login_flow": "POST /auth/login -> receive access_token -> store in localStorage -> add Bearer header to all requests",
+    "register_flow": "POST /auth/register -> validate email & phone uniqueness -> create user -> auto login or redirect to login",
+    "otp_flow": "POST /auth/send-otp (email/phone) -> POST /auth/verify-otp -> mark user verified",
+    "logout": "Clear localStorage token/user -> call POST /auth/logout (optional) -> redirect to home",
+    "interceptors": {
+      "request": "Adds 'Authorization: Bearer {token}' header if token exists",
+      "response": "On 401 error: clear auth, redirect to /login"
+    },
+    "security_notes": "Backend uses bcrypt for password hashing, JWT for tokens, timing attack mitigation on login"
+  },
+  "hooks_and_utilities": {
+    "hooks": {
+      "useMapFilters.ts": "Manages map filter state and controls",
+      "useSavedSearches.ts": "Persists and retrieves saved search queries"
+    },
+    "utils": {
+      "api_client.ts": "Axios instance with all service modules (propertyAPI, authAPI, userAPI, etc)",
+      "imageUrl.ts": "Helpers for image URL construction and validation",
+      "analytics.ts": "Frontend analytics tracking and events",
+      "mapIcons.ts": "Map marker icons and legend utilities",
+      "sanitization": "Input sanitization via DOMPurify (if installed) or basic trimming"
+    },
+    "types": "src/types/index.ts - TypeScript interfaces for User, Property, Inquiry, Notification, Chat, etc"
+  },
+  "key_backend_features_implemented": {
+    "user_management": [
+      "User registration with email & phone validation",
+      "Login via OAuth2 form with JWT token response",
+      "Profile viewing and updates",
+      "Account deletion with cascading image cleanup",
+      "OTP-based email/phone verification"
+    ],
+    "property_listings": [
+      "Create, read, update, delete properties (CRUD)",
+      "Auto-generate property title if missing",
+      "Bulk delete with image path validation",
+      "Multi-image uploads (multipart/form-data)",
+      "Search with filters: city, type, listing_type, price range, bedrooms, furnished, sort, pagination",
+      "View count increment per property access",
+      "Owner-only modifications"
+    ],
+    "geospatial_search": [
+      "Radius search using Haversine formula with bounding box pre-filter",
+      "Geofence polygon search with polygon and bounding box",
+      "Optional filters on radius/geofence searches"
+    ],
+    "inquiries": [
+      "Create inquiry for property (prevents owner self-inquiry and duplicates)",
+      "List user's outbound inquiries",
+      "List inquiries received on user's properties",
+      "Update inquiries (property owners can update inquiries on their properties)",
+      "Delete inquiries (user can delete own inquiries)",
+      "Bulk delete inquiries"
+    ],
+    "wishlist_favorites": [
+      "Add property to wishlist",
+      "Remove from wishlist",
+      "View full wishlist with property details",
+      "Check if specific property is favorited"
+    ],
+    "notifications": [
+      "List latest 20 notifications per user",
+      "Mark individual notification as read",
+      "Mark all unread notifications as read",
+      "Unread count tracking"
+    ],
+    "social_and_engagement": [
+      "Derive contacts list from inquiries (unique owners contacted)",
+      "User activity timeline (inquiries + listings)",
+      "Property visits tracking (PropertyVisit model)",
+      "Rental agreements management (tenant-facing)"
+    ],
+    "gamification": [
+      "Referral code generation (PROP{user_id:06d} format)",
+      "Referral stats (mock/stubbed for future implementation)",
+      "User points calculation from properties and inquiries",
+      "Available rewards listing (static)"
+    ],
+    "ai_and_automation": [
+      "Rule-based chatbot for common queries",
+      "Keyword-based responses and suggestions",
+      "Lightweight assistant (not LLM-based)"
+    ],
+    "debugging_and_testing": [
+      "Property sample endpoint (limit 5, debug only)",
+      "Stats and city count endpoint (debug only)"
+    ]
+  },
+  "data_models_available": {
+    "user": "User (id, email, phone, full_name, verified, created_at, updated_at, etc)",
+    "property": "Property (id, owner_id, title, description, city, lat, lng, price, bedrooms, furnished, listing_type, views, created_at, updated_at, images relation)",
+    "inquiry": "Inquiry (id, user_id, property_id, message, status, created_at, updated_at)",
+    "wishlist": "Wishlist (id, user_id, property_id, created_at)",
+    "notification": "Notification (id, user_id, message, is_read, created_at)",
+    "visit": "PropertyVisit (id, user_id, property_id, visit_date)",
+    "agreement": "RentalAgreement (id, tenant_id, property_id, terms, created_at)",
+    "otp": "OTP (id, user_id, code, verified, created_at, expires_at)",
+    "chat": "Chat (id, user_id, message, response)",
+    "property_image": "PropertyImage (id, property_id, image_url, created_at)"
+  },
+  "file_handling": {
+    "upload_directory": "Mounted as /static in backend; configured via config.upload_dir",
+    "file_security": "secure_file_path validation for deletion to prevent directory traversal",
+    "multipart_support": "POST /properties/{id}/images accepts FormData with images",
+    "cascade_deletion": "User and property deletion removes associated images from filesystem"
+  },
+  "development_notes": {
+    "otp_behavior": "OTP returned/printed in dev when email not configured; proper SMTP in production",
+    "referrals_rewards": "Referral stats and some reward endpoints are stub implementations pending business logic",
+    "chatbot": "Simple keyword matching; expandable for LLM integration",
+    "security_hardening": "Further production hardening recommended beyond current JWT + bcrypt + timing attack mitigation",
+    "sanitization": "Optional DOMPurify integration; basic trimming fallback",
+    "rate_limiting": "Backend middleware includes rate_limiter"
+  },
+  "testing": {
+    "framework": "Jest/React Testing Library for frontend; pytest for backend",
+    "test_files": "test_api_integration.ts, test components, integration tests",
+    "coverage": "Auth, properties, inquiries, OTP, permissions, geospatial, wishlist, notifications"
+  },
+  "deployment_and_config": {
+    "frontend_env": "NEXT_PUBLIC_API_URL (default: http://localhost:8000/api/v1)",
+    "backend_env": "DATABASE_URL, SECRET_KEY, UPLOAD_DIR, ALLOWED_ORIGINS, EMAIL_CONFIG, TOKEN_EXPIRY",
+    "docker": "Separate Dockerfile for frontend and backend; docker-compose.yml provided",
+    "production_ready": "Bearer token auth, CORS headers, rate limiting, input validation"
+  },
+  "next_steps": [
+    "Ensure all page components use corresponding API modules from api_client.ts",
+    "Implement UI for all features (especially referrals, timeline, visits, agreements)",
+    "Add form validation and error handling for all user inputs",
+    "Integrate Toast/notification feedback for all API calls",
+    "Add loading states and skeleton loaders for better UX",
+    "Implement pagination for list endpoints (properties, inquiries, notifications)",
+    "Add real-time notifications (WebSocket integration if needed)",
+    "Add property image lazy-loading and optimization",
+    "Implement search result caching with stale-while-revalidate",
+    "Add analytics tracking for user journeys",
+    "Set up E2E tests with Cypress or Playwright"
+  ],
+  "integration_status": {
+    "auth_service": "✓ Fully integrated (login, register, OTP, logout)",
+    "property_service": "✓ Fully integrated (CRUD, search, filters, geospatial, bulk operations)",
+    "user_service": "✓ Fully integrated (profile, properties, account deletion)",
+    "inquiry_service": "✓ Fully integrated (create, list, update, delete, bulk delete)",
+    "wishlist_service": "✓ Fully integrated (add, remove, check, list)",
+    "notification_service": "✓ Fully integrated (list, mark read, mark all read)",
+    "contacts_service": "✓ Integrated (derives from inquiries)",
+    "timeline_service": "✓ Integrated (activity stream)",
+    "visits_service": "✓ Integrated (property visit tracking)",
+    "agreements_service": "✓ Integrated (rental agreements for tenants)",
+    "rewards_service": "✓ Integrated (points, available rewards)",
+    "referrals_service": "✓ Integrated (code generation, stats mock)",
+    "chatbot_service": "✓ Integrated (rule-based chat)",
+    "ui_components": "⚠ Partial - Core components exist; feature-specific components may need enhancement"
+  }
+}
