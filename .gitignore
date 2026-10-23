@@ -5,6 +5,7 @@ out/
 dist/
 build/
 .npm
+*.tsbuildinfo
 
 # ===== ENVIRONMENT & SECRETS =====
 .env
