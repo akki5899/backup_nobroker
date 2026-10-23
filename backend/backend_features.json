@@ -1,0 +1,139 @@
+{
+  "project": "PropDirect API",
+  "description": "Inventory of backend features, API endpoints, services, models and utilities",
+  "generated_at": "2026-02-15T00:00:00Z",
+  "routers": [
+    {
+      "prefix": "/api/v1/auth",
+      "endpoints": [
+        {"method": "GET", "path": "/check-user", "auth_required": false, "description": "Check whether a user exists by email", "request": "query: email", "response": "{exists, email, id}"},
+        {"method": "POST", "path": "/register", "auth_required": false, "description": "Register a new user (validates email & phone uniqueness)", "request": "UserCreate", "response": "UserResponse"},
+        {"method": "POST", "path": "/login", "auth_required": false, "description": "Login using OAuth2 form - returns JWT access token", "request": "OAuth2PasswordRequestForm", "response": "Token"},
+        {"method": "POST", "path": "/send-otp", "auth_required": false, "description": "Create and send OTP to email or phone", "request": "SendOTPRequest", "response": "OTPResponse"},
+        {"method": "POST", "path": "/verify-otp", "auth_required": false, "description": "Verify OTP for email or phone and mark verified on User", "request": "VerifyOTPRequest", "response": "OTPResponse"}
+      ]
+    },
+    {
+      "prefix": "/api/v1/properties",
+      "endpoints": [
+        {"method": "POST", "path": "/", "auth_required": true, "description": "Create a property (owner) - auto generates title if missing", "request": "PropertyCreate", "response": "PropertyResponse"},
+        {"method": "GET", "path": "/", "auth_required": false, "description": "Search/list properties with filters, sort and pagination", "request": "query params (city, type, listing_type, min_price, max_price, bedrooms, furnished, sort_by, page, limit)", "response": "List<PropertyResponse>"},
+        {"method": "GET", "path": "/{property_id}", "auth_required": false, "description": "Get property by id and increment views", "request": "path: property_id", "response": "PropertyResponse"},
+        {"method": "PUT", "path": "/{property_id}", "auth_required": true, "description": "Update property (owner only)", "request": "PropertyUpdate", "response": "PropertyResponse"},
+        {"method": "DELETE", "path": "/{property_id}", "auth_required": true, "description": "Delete a property (owner only) and remove images from filesystem", "request": "path: property_id", "response": "{message}"},
+        {"method": "DELETE", "path": "/bulk", "auth_required": true, "description": "Bulk delete properties by IDs (owner only) with path validation for images", "request": "body: List<int>", "response": "{message}"},
+        {"method": "POST", "path": "/radius-search", "auth_required": false, "description": "Radius search using Haversine formula with pre-filtering via bounding box", "request": "lat, lng, radius_km, optional filters", "response": "List<PropertyResponse>"},
+        {"method": "POST", "path": "/geofence-search", "auth_required": false, "description": "Search properties within a polygon (geofence) using bounding box for DB filtering", "request": "GeofenceSearch (coordinates + optional filters)", "response": "List<PropertyResponse>"},
+        {"method": "GET", "path": "/debug/sample", "auth_required": false, "description": "Debug endpoint - sample properties (limit 5)", "request": "none", "response": "sample properties list"},
+        {"method": "GET", "path": "/debug/count", "auth_required": false, "description": "Debug counts and sample cities", "request": "none", "response": "stats object"}
+      ]
+    },
+    {
+      "prefix": "/api/v1/users",
+      "endpoints": [
+        {"method": "GET", "path": "/me", "auth_required": true, "description": "Get current authenticated user's profile", "response": "UserResponse"},
+        {"method": "PUT", "path": "/me", "auth_required": true, "description": "Update current user's profile fields", "request": "UserUpdate", "response": "UserResponse"},
+        {"method": "DELETE", "path": "/me", "auth_required": true, "description": "Delete current user and associated property images from filesystem", "response": "{message}"},
+        {"method": "GET", "path": "/my-properties", "auth_required": true, "description": "List properties owned by current user", "response": "List<PropertyResponse>"}
+      ]
+    },
+    {
+      "prefix": "/api/v1/inquiries",
+      "endpoints": [
+        {"method": "POST", "path": "/", "auth_required": true, "description": "Create inquiry for a property (prevents owner and duplicates)", "request": "InquiryCreate", "response": "InquiryResponse"},
+        {"method": "GET", "path": "/my-inquiries", "auth_required": true, "description": "List inquiries made by current user", "response": "List<InquiryResponse>"},
+        {"method": "GET", "path": "/property-inquiries", "auth_required": true, "description": "List inquiries for properties owned by current user", "response": "List<InquiryResponse>"},
+        {"method": "DELETE", "path": "/bulk", "auth_required": true, "description": "Bulk delete inquiries belonging to the current user", "request": "body: List<int>", "response": "{message}"},
+        {"method": "DELETE", "path": "/{inquiry_id}", "auth_required": true, "description": "Delete a specific inquiry belonging to current user", "response": "{message}"},
+        {"method": "PUT", "path": "/{inquiry_id}", "auth_required": true, "description": "Update an inquiry (only property owner may update inquiries on their properties)", "request": "InquiryUpdate", "response": "InquiryResponse"}
+      ]
+    },
+    {
+      "prefix": "/api/v1/wishlist",
+      "endpoints": [
+        {"method": "GET", "path": "/", "auth_required": true, "description": "Get wishlist items for current user with property details", "response": "List<wishlist item>"},
+        {"method": "POST", "path": "/{property_id}", "auth_required": true, "description": "Add a property to wishlist", "response": "{message}"},
+        {"method": "DELETE", "path": "/{property_id}", "auth_required": true, "description": "Remove a property from wishlist", "response": "{message}"},
+        {"method": "GET", "path": "/check/{property_id}", "auth_required": true, "description": "Check whether a property is favorited by current user", "response": "{is_favorited: boolean}"}
+      ]
+    },
+    {
+      "prefix": "/api/v1/notifications",
+      "endpoints": [
+        {"method": "GET", "path": "/", "auth_required": true, "description": "Get latest notifications for current user (limit 20) + unread count", "response": "{notifications, unread_count}"},
+        {"method": "PUT", "path": "/{notification_id}/read", "auth_required": true, "description": "Mark a notification as read", "response": "{message}"},
+        {"method": "PUT", "path": "/mark-all-read", "auth_required": true, "description": "Mark all unread notifications as read", "response": "{message}"}
+      ]
+    },
+    {
+      "prefix": "/api/v1/contacts",
+      "endpoints": [
+        {"method": "GET", "path": "/my-contacts", "auth_required": true, "description": "Derive list of unique contacted owners from user's inquiries", "response": "{contacts: [...] }"}
+      ]
+    },
+    {
+      "prefix": "/api/v1/referrals",
+      "endpoints": [
+        {"method": "GET", "path": "/code", "auth_required": true, "description": "Generate referral code for current user (formatted PROP{user_id:06d})", "response": "{referral_code}"},
+        {"method": "GET", "path": "/stats", "auth_required": true, "description": "Return mock referral stats (stubbed)", "response": "{total_referrals, total_earnings, referrals}"}
+      ]
+    },
+    {
+      "prefix": "/api/v1/rewards",
+      "endpoints": [
+        {"method": "GET", "path": "/points", "auth_required": true, "description": "Compute points for user based on activities (properties listed, inquiries)", "response": "{points}"},
+        {"method": "GET", "path": "/available", "auth_required": false, "description": "List available rewards (static list)", "response": "{rewards}"}
+      ]
+    },
+    {
+      "prefix": "/api/v1/timeline",
+      "endpoints": [
+        {"method": "GET", "path": "/activities", "auth_required": true, "description": "Build user activity timeline from inquiries and listings", "response": "{activities}"}
+      ]
+    },
+    {
+      "prefix": "/api/v1/visits",
+      "endpoints": [
+        {"method": "GET", "path": "/my-visits", "auth_required": true, "description": "Fetch property visits for current user (PropertyVisit model)", "response": "{visits}"}
+      ]
+    },
+    {
+      "prefix": "/api/v1/agreements",
+      "endpoints": [
+        {"method": "GET", "path": "/my-agreements", "auth_required": true, "description": "Fetch rental agreements for current user (tenant) and return formatted agreement info", "response": "{agreements}"}
+      ]
+    },
+    {
+      "prefix": "/api/v1/chatbot",
+      "endpoints": [
+        {"method": "POST", "path": "/chat", "auth_required": false, "description": "Rule-based chatbot responding to common queries and returning suggestions", "request": "ChatMessage", "response": "ChatResponse"}
+      ]
+    }
+  ],
+  "services": {
+    "auth": "Token verification, HTTPBearer dependency, get_current_user, get_current_active_user",
+    "otp": "OTP generation, create_otp (stores in DB), verify_otp, send_email_otp (SMTP with dev fallback), send_sms_otp (mock)",
+    "permissions": "require_owner and other permission helpers (used in properties)"
+  },
+  "core_components": {
+    "security": "password hashing (bcrypt via passlib), create_access_token & verify_token using jose.JWT",
+    "database": "SQLAlchemy engine, session dependency get_db, Base metadata auto-create in main.py",
+    "config": "settings for environment, secret_key, upload_dir, allowed_origins, email config, token expiry"
+  },
+  "models": [
+    "user.py", "property.py", "property_image.py", "inquiry.py", "chat.py", "lead.py", "subscription.py", "otp.py", "notification.py", "wishlist.py", "visits_agreements.py"
+  ],
+  "utils_and_other": {
+    "file_handling": "uploads mounted as static directory; secure_file_path used to validate file paths for deletion",
+    "middleware": "rate_limiter exists",
+    "tests": "pytest test suite covering auth, properties, otp, permissions, integration and more",
+    "debug_endpoints": "properties debug/sample and debug/count"
+  },
+  "notes": {
+    "otp_dev_behavior": "OTP is printed / returned as success when email config is not present (development convenience)",
+    "referrals_and_rewards": "Referral stats and some reward endpoints are stub/mock implementations not backed by persistent tables",
+    "chatbot": "Simple keyword based responses; intended for lightweight assistant, not an LLM integration",
+    "security_considerations": "Login mitigates timing attacks via dummy hash and minimum processing delay; JWT & bcrypt used; further production hardening recommended"
+  }
+}
+
